@@ -4,6 +4,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:core';
 
+import 'package:weather_forecast/network/api/api.dart';
+
 class DailyWeatherScreen extends StatefulWidget {
   const DailyWeatherScreen({super.key});
 
@@ -111,7 +113,9 @@ class _DailyWeatherScreenState extends State<DailyWeatherScreen> {
                   child: Text("Buttoning"),
                   onPressed: () {
                     final location = getCurrentLocation();
-                    location.then((value) => print(value));
+                    location.then((value) {
+                      getTodayWeather(value[0], value[1]);
+                    });
                   },
                 ),
               ],
