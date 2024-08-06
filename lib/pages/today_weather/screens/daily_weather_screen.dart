@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'dart:core';
 
 import 'package:weather_forecast/network/api/api.dart';
+import 'package:weather_forecast/pages/home_screen/provider/active_title_provider.dart';
 
-class DailyWeatherScreen extends StatefulWidget {
+class DailyWeatherScreen extends ConsumerStatefulWidget {
   const DailyWeatherScreen({super.key});
 
   @override
-  State<DailyWeatherScreen> createState() => _DailyWeatherScreenState();
+  ConsumerState<DailyWeatherScreen> createState() => _DailyWeatherScreenState();
 }
 
-class _DailyWeatherScreenState extends State<DailyWeatherScreen> {
+class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
   Future<bool>? isLocationPermitted;
 
   @override
@@ -81,8 +83,24 @@ class _DailyWeatherScreenState extends State<DailyWeatherScreen> {
     return [location.latitude, location.longitude].toList();
   }
 
+  Future<Map<String, dynamic>> getWeatherData() async {
+    final location = await getCurrentLocation();
+
+    String lat = location[0].toStringAsFixed(2);
+    String lon = location[1].toStringAsFixed(2);
+    final response =
+        await getTodayWeather(double.parse(lon), double.parse(lat), mounted);
+    return response;
+  }
+
   @override
   Widget build(BuildContext context) {
+    getWeatherData().then((value) {
+      if (mounted) {
+        ref.read(titleProvider.notifier).overrideTitle(value["name"]);
+      }
+    });
+
     return FutureBuilder<bool>(
       future: isLocationPermitted,
       builder: (context, snapshot) {
@@ -105,21 +123,42 @@ class _DailyWeatherScreenState extends State<DailyWeatherScreen> {
             ),
           );
         } else {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextButton(
-                  child: Text("Buttoning"),
-                  onPressed: () {
-                    final location = getCurrentLocation();
-                    location.then((value) {
-                      getTodayWeather(value[0], value[1]);
-                    });
-                  },
-                ),
-              ],
-            ),
+          return FutureBuilder<Map<String, dynamic>>(
+            future: getWeatherData(),
+            builder: (context, weatherSnapshot) {
+              if (weatherSnapshot.connectionState == ConnectionState.waiting) {
+                return const Center(
+                  child: CircularProgressIndicator(),
+                );
+              } else if (weatherSnapshot.hasError ||
+                  !weatherSnapshot.hasData ||
+                  weatherSnapshot.data!.isEmpty) {
+                return const Center(
+                  child: Text(
+                    "Unable to get weather data. Please try again later.",
+                    textAlign: TextAlign.center,
+                  ),
+                );
+              } else {
+                final weatherData = weatherSnapshot.data!;
+
+                return Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(
+                      height: 20,
+                    ),
+                    Text(
+                      weatherData["name"],
+                      style: Theme.of(context)
+                          .textTheme
+                          .titleMedium!
+                          .copyWith(fontSize: 20),
+                    ),
+                  ],
+                );
+              }
+            },
           );
         }
       },

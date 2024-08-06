@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_forecast/pages/home_screen/screens/homescreen.dart';
 import 'config/theme/util.dart';
 import 'config/theme/theme.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 Future main() async {
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
   await dotenv.load(fileName: ".env");
 }
 

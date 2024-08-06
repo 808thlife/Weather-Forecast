@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_forecast/pages/home_screen/provider/active_title_provider.dart';
 import 'package:weather_forecast/pages/today_weather/screens/daily_weather_screen.dart';
 import 'package:weather_forecast/pages/week_weather/screens/week_weather_screen.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
   String _activeTitle = "Today Weather";
 
@@ -36,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen> {
       length: 2,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(_activeTitle),
+          title: Text(ref.watch(titleProvider)),
         ),
         bottomNavigationBar: BottomNavigationBar(
           currentIndex: _selectedIndex,
