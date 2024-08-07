@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:weather_forecast/core/utils/handle_location_permissions.dart';
 import 'dart:core';
 
 import 'package:weather_forecast/network/api/api.dart';
@@ -21,60 +21,15 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
   @override
   void initState() {
     super.initState();
-    isLocationPermitted = _handleLocationPermission();
-  }
+    isLocationPermitted = handleLocationPermission(context, mounted);
 
-  Future<bool> _handleLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-              'Location services are disabled. Please enable the services'),
-          action: SnackBarAction(
-              label: "Settings",
-              onPressed: () {
-                openAppSettings();
-              }),
-        ),
-      );
-      return false;
-    }
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Location permissions are denied'),
-          action: SnackBarAction(
-              label: "Settings",
-              onPressed: () {
-                openAppSettings();
-              }),
-        ));
-
-        return false;
-      }
-    }
-    if (permission == LocationPermission.deniedForever && mounted) {
-      ScaffoldMessenger.of(context).removeCurrentSnackBar();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text(
-              'Location permissions are permanently denied, we cannot request permissions.'),
-          action: SnackBarAction(
-              label: "Settings",
-              onPressed: () {
-                openAppSettings();
-              }),
-        ),
-      );
-      return false;
-    }
-    return true;
+    Future(() {
+      getWeatherData().then((value) {
+        if (mounted) {
+          ref.watch(titleProvider.notifier).overrideTitle(value["name"]);
+        }
+      });
+    });
   }
 
   Future<List<double>> getCurrentLocation() async {
@@ -95,12 +50,6 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
 
   @override
   Widget build(BuildContext context) {
-    getWeatherData().then((value) {
-      if (mounted) {
-        ref.read(titleProvider.notifier).overrideTitle(value["name"]);
-      }
-    });
-
     return FutureBuilder<bool>(
       future: isLocationPermitted,
       builder: (context, snapshot) {
