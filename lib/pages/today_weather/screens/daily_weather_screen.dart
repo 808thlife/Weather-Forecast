@@ -4,8 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:weather_forecast/core/utils/handle_location_permissions.dart';
 import 'dart:core';
 
+import 'package:intl/intl.dart';
+
 import 'package:weather_forecast/network/api/api.dart';
 import 'package:weather_forecast/pages/home_screen/provider/active_title_provider.dart';
+import 'package:weather_forecast/pages/today_weather/widgets/weather_icon.dart';
 
 class DailyWeatherScreen extends ConsumerStatefulWidget {
   const DailyWeatherScreen({super.key});
@@ -83,7 +86,7 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                 );
               } else {
                 final weatherData = weatherSnapshot.data!;
-
+                print(weatherData);
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
@@ -100,37 +103,85 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                             .titleSmall!
                             .copyWith(fontSize: 20),
                       ),
-                      Image.asset(
-                        "assets/weather_icons/cloudy_night.png",
-                        height: 200,
-                        width: 200,
-                        fit: BoxFit.fill,
+                      // Image.asset(
+                      //   "assets/weather_icons/cloudy_night.png",
+                      //   height: 200,
+                      //   width: 200,
+                      //   fit: BoxFit.fill,
+                      // ),
+                      WeatherIcon(
+                        weather: weatherData["weather"][0]["main"],
+                        currentTime: DateTime.now(),
                       ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Text(
-                            "${weatherData["main"]["temp"].toString()} F, but feels like ${weatherData["main"]["feels_like"]} F",
-                            style: Theme.of(context).textTheme.titleMedium,
-                          )
+                          Expanded(
+                            child: ((weatherData["main"]["temp"] as double)
+                                        .toStringAsFixed(0) ==
+                                    (weatherData["main"]["feels_like"]
+                                            as double)
+                                        .toStringAsFixed(0))
+                                ? Text(
+                                    "${(weatherData["main"]["temp"] as double).toStringAsFixed(0)} °C",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                    textAlign: TextAlign.center,
+                                  )
+                                : Text(
+                                    "${(weatherData["main"]["temp"] as double).toStringAsFixed(0)} °C, but feels like ${(weatherData["main"]["feels_like"] as double).toStringAsFixed(0)} °C",
+                                    style:
+                                        Theme.of(context).textTheme.titleMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                          ),
                         ],
                       ),
                       const SizedBox(
-                        height: 15,
+                        height: 40,
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(left: 25),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            const Icon(Icons.wind_power_outlined),
-                            const SizedBox(
-                              width: 4,
-                            ),
-                            Text(
-                                "${weatherData["wind"]["speed"].toString()} m/s"),
-                          ],
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          Row(
+                            children: [
+                              Image.asset(
+                                "assets/weather_icons/sunrise.png",
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.scaleDown,
+                              ),
+                              Text(
+                                DateFormat.Hm()
+                                    .format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          weatherData["sys"]["sunset"] * 1000),
+                                    )
+                                    .toString(),
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Image.asset(
+                                "assets/weather_icons/sunset.png",
+                                height: 50,
+                                width: 50,
+                                fit: BoxFit.scaleDown,
+                              ),
+                              Text(
+                                DateFormat.Hm()
+                                    .format(
+                                      DateTime.fromMillisecondsSinceEpoch(
+                                          weatherData["sys"]["sunrise"] * 1000),
+                                    )
+                                    .toString(),
+                                style: Theme.of(context).textTheme.titleMedium,
+                              ),
+                            ],
+                          ),
+                        ],
                       )
                     ],
                   ),
