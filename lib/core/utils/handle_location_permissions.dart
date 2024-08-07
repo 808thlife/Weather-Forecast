@@ -57,3 +57,9 @@ Future<bool> handleLocationPermission(
   }
   return true;
 }
+
+Future<List<double>> getCurrentLocation() async {
+  final location = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.medium);
+  return [location.latitude, location.longitude].toList();
+}

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import 'package:geolocator/geolocator.dart';
 import 'package:weather_forecast/core/utils/handle_location_permissions.dart';
 import 'dart:core';
 
@@ -30,12 +29,6 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
         }
       });
     });
-  }
-
-  Future<List<double>> getCurrentLocation() async {
-    final location = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.medium);
-    return [location.latitude, location.longitude].toList();
   }
 
   Future<Map<String, dynamic>> getWeatherData() async {
@@ -90,15 +83,15 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                 );
               } else {
                 final weatherData = weatherSnapshot.data!;
-                print(weatherData);
+
                 return Padding(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
+                    mainAxisAlignment: MainAxisAlignment.start,
                     children: [
                       const SizedBox(
-                        height: 20,
+                        height: 40,
                       ),
                       Text(
                         weatherData["weather"][0]["main"],
@@ -108,8 +101,7 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                             .copyWith(fontSize: 20),
                       ),
                       Image.asset(
-                        "assets/weather_icons/mist-and-cloud.png",
-                        color: Colors.white,
+                        "assets/weather_icons/cloudy_night.png",
                         height: 200,
                         width: 200,
                         fit: BoxFit.fill,

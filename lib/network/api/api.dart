@@ -18,14 +18,16 @@ Future<Map<String, dynamic>> getTodayWeather(
   return {};
 }
 
-Future<void> getWeekData(double lon, double lat, bool mounted) async {
+Future<Map<String, dynamic>> getForecast(
+    double lon, double lat, bool mounted) async {
   final String? key = dotenv.env['OPENWEATHER_API_KEY'];
   final String url =
-      "api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$key";
-
+      "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&appid=$key";
+  print(url);
   final response = await http.get(Uri.parse(url));
-
+  print(response.body);
   if (mounted && response.statusCode == 200) {
-    print(jsonDecode(response.body));
+    return jsonDecode(response.body);
   }
+  return {};
 }
