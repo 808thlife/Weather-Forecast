@@ -141,21 +141,58 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                 );
               } else {
                 final weatherData = weatherSnapshot.data!;
-
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    const SizedBox(
-                      height: 20,
-                    ),
-                    Text(
-                      weatherData["name"],
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleMedium!
-                          .copyWith(fontSize: 20),
-                    ),
-                  ],
+                print(weatherData);
+                return Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const SizedBox(
+                        height: 20,
+                      ),
+                      Text(
+                        weatherData["weather"][0]["main"],
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleSmall!
+                            .copyWith(fontSize: 20),
+                      ),
+                      Image.asset(
+                        "assets/weather_icons/mist-and-cloud.png",
+                        color: Colors.white,
+                        height: 200,
+                        width: 200,
+                        fit: BoxFit.fill,
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${weatherData["main"]["temp"].toString()} F, but feels like ${weatherData["main"]["feels_like"]} F",
+                            style: Theme.of(context).textTheme.titleMedium,
+                          )
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 15,
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 25),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            const Icon(Icons.wind_power_outlined),
+                            const SizedBox(
+                              width: 4,
+                            ),
+                            Text(
+                                "${weatherData["wind"]["speed"].toString()} m/s"),
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 );
               }
             },

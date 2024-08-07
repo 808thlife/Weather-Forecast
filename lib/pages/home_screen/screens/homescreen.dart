@@ -13,7 +13,6 @@ class HomeScreen extends ConsumerStatefulWidget {
 
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _selectedIndex = 0;
-  String _activeTitle = "Today Weather";
 
   static const List<Widget> _widgetOptions = <Widget>[
     DailyWeatherScreen(),
@@ -23,12 +22,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
-
-      if (_selectedIndex == 0) {
-        _activeTitle = "Today Weather";
-      } else {
-        _activeTitle = "This Week's Weather";
-      }
     });
   }
 
