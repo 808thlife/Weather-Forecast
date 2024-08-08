@@ -3,6 +3,8 @@ import 'package:weather_forecast/core/utils/handle_location_permissions.dart';
 import 'package:weather_forecast/network/api/api.dart';
 import 'package:weather_forecast/pages/home_screen/provider/active_title_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:weather_forecast/pages/week_weather/widgets/week_day_card.dart';
+import 'package:weather_forecast/pages/week_weather/widgets/week_day_column.dart';
 
 class WeekWeatherScreen extends ConsumerStatefulWidget {
   const WeekWeatherScreen({super.key});
@@ -39,15 +41,30 @@ class _WeekWeatherScreenState extends ConsumerState<WeekWeatherScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: TextButton(
-        onPressed: () {
-          _fetchForecast().then((value) {
-            print(value);
-          });
-        },
-        child: Text("Something"),
-      ),
+    return FutureBuilder(
+      future: _fetchForecast(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        } else if (!snapshot.hasData || snapshot.hasError) {
+          return Center(
+            child: Text(
+              "Something went wrong. Please, try again later",
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+          );
+        } else {
+          return Center(
+            child: Expanded(
+              child: WeekDayColumn(
+                forecast: snapshot.data,
+              ),
+            ),
+          );
+        }
+      },
     );
   }
 }

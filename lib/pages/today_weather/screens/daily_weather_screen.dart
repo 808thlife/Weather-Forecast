@@ -97,18 +97,12 @@ class _DailyWeatherScreenState extends ConsumerState<DailyWeatherScreen> {
                         height: 40,
                       ),
                       Text(
-                        weatherData["weather"][0]["main"],
+                        "${weatherData["weather"][0]["main"]} (${weatherData["weather"][0]["description"]})",
                         style: Theme.of(context)
                             .textTheme
                             .titleSmall!
                             .copyWith(fontSize: 20),
                       ),
-                      // Image.asset(
-                      //   "assets/weather_icons/cloudy_night.png",
-                      //   height: 200,
-                      //   width: 200,
-                      //   fit: BoxFit.fill,
-                      // ),
                       WeatherIcon(
                         weather: weatherData["weather"][0]["main"],
                         currentTime: DateTime.now(),

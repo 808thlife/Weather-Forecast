@@ -23,9 +23,9 @@ Future<Map<String, dynamic>> getForecast(
   final String? key = dotenv.env['OPENWEATHER_API_KEY'];
   final String url =
       "https://api.openweathermap.org/data/2.5/forecast?lat=$lat&lon=$lon&units=metric&appid=$key";
-  print(url);
+  // print(url);
   final response = await http.get(Uri.parse(url));
-  print(response.body);
+  // print(response.body);
   if (mounted && response.statusCode == 200) {
     return jsonDecode(response.body);
   }
